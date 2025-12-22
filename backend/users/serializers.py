@@ -2,6 +2,7 @@ from attr import fields
 from rest_framework import serializers
 import serial
 from wtforms import ValidationError
+from yaml import serialize
 from .models import User
 from . import utils
 
@@ -96,8 +97,28 @@ class UpdateNameSerializer(serializers.Serializer):
     def save(self):
         user = User.objects.get(user_code=self.validated_data['user_code'])
         
-        # OTP verification later
+        # KYC later
         user.full_name = self.validated_data['name']
         user.save(update_fields=["full_name"])
         
         return user
+
+class DeleteUserSerializer(serializers.Serializer):
+    user_code = serializers.CharField()
+    
+    def validate_user_code(self, value):
+        try:
+            user = User.objects.get(user_code=value)
+        except User.DoesNotExist:
+            raise serializers.ValidationError("Invalid user_code")
+        
+        if user.delete_status:
+            raise serializers.ValidationError("User already deleted")
+        
+        self.user = user
+        return user
+    
+    def save(self):
+        self.user.delete_status = True
+        self.user.save(update_fields=["delete_status"])
+        return self.user

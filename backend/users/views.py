@@ -98,3 +98,17 @@ def update_email(request):
         },
         status=status.HTTP_200_OK
     )
+    
+@api_view(['POST'])
+def delete_user(request):
+    serializer = serializers.DeleteUserSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
+    
+    return Response(
+        {
+            "message": "User deleted successfully"
+        },
+        status=status.HTTP_200_OK
+    )
+    
