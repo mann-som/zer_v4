@@ -2,7 +2,7 @@ from django.db import models
 import uuid
 
 class User(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, db_index=True)
     user_code = models.CharField(max_length=20, unique=True, db_index=True)
     
     email = models.EmailField(unique=True)

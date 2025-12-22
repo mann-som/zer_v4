@@ -1,3 +1,4 @@
+from tkinter.tix import Tree
 from django.http import JsonResponse
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -56,4 +57,16 @@ class UserListView(APIView):
         serializer = serializers.UserDetailsSerializer(users, many=True)
         return Response(serializer.data)
                                                 
-                                                                                                                                                                                                                                                                                                                                                                                         
+@api_view(['POST'])
+def update_email(request):
+    serializer = serializers.UpdateEmailSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    user = serializer.save()
+    
+    return Response(
+        {
+            "message": "Email updated successfully",
+            "email": user.email
+        },
+        status=status.HTTP_200_OK
+    )

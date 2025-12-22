@@ -1,5 +1,7 @@
 from attr import fields
 from rest_framework import serializers
+import serial
+from wtforms import ValidationError
 from .models import User
 from . import utils
 
@@ -33,3 +35,25 @@ class UserDetailsSerializer(serializers.ModelSerializer):
             "created_at",
             "mobile", 
         )
+        
+class UpdateEmailSerializer(serializers.Serializer):
+    user_code = serializers.CharField()
+    email = serializers.EmailField()
+    
+    def validate(self, data):
+        if not User.objects.filter(user_code=data['user_code'], delete_status=False).exists():
+            raise serializers.ValidationError("Invalid user_code")
+        
+        if User.objects.filter(email=data['email']).exists():
+            raise serializers.ValidationError("Email already in use")
+        
+        return data
+    
+    def save(self):
+        user = User.objects.get(user_code=self.validated_data['user_code'])
+        
+        # OTP verification later
+        user.email = self.validated_data['email']
+        user.save(update_fields=["email"])
+        
+        return user
