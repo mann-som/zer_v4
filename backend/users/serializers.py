@@ -57,3 +57,47 @@ class UpdateEmailSerializer(serializers.Serializer):
         user.save(update_fields=["email"])
         
         return user
+
+class UpdateMobileSerializer(serializers.Serializer):
+    user_code = serializers.CharField()
+    mobile = serializers.CharField()
+    
+    def validate(self, data):
+        if not User.objects.filter(user_code=data['user_code'], delete_status=False).exists():
+            raise serializers.ValidationError("Invalid user_code")
+        
+        if User.objects.filter(mobile=data['mobile']).exists():
+            raise serializers.ValidationError("Phone number already in use")
+        
+        return data
+    
+    def save(self):
+        user = User.objects.get(user_code=self.validated_data['user_code'])
+        
+        # OTP verification later
+        user.mobile = self.validated_data['mobile']
+        user.save(update_fields=["mobile"])
+        
+        return user
+    
+class UpdateNameSerializer(serializers.Serializer):
+    user_code = serializers.CharField()
+    name = serializers.CharField()
+    
+    def validate(self, data):
+        if not User.objects.filter(user_code=data['user_code'], delete_status=False).exists():
+            raise serializers.ValidationError("Invalid user_code")
+        
+        # if User.objects.filter(email=data['email']).exists():
+        #     raise serializers.ValidationError("Email already in use")
+        
+        return data
+    
+    def save(self):
+        user = User.objects.get(user_code=self.validated_data['user_code'])
+        
+        # OTP verification later
+        user.full_name = self.validated_data['name']
+        user.save(update_fields=["full_name"])
+        
+        return user

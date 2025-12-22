@@ -56,7 +56,35 @@ class UserListView(APIView):
 
         serializer = serializers.UserDetailsSerializer(users, many=True)
         return Response(serializer.data)
-                                                
+                                   
+@api_view(['POST'])
+def update_mobile(request):
+    serializer = serializers.UpdateMobileSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    user = serializer.save()
+    
+    return Response(
+        {
+            "message": "Phone number updated successfully",
+            "phone": user.mobile
+        },
+        status=status.HTTP_200_OK
+    )
+
+@api_view(['POST'])
+def update_name(request):
+    serializer = serializers.UpdateNameSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    user = serializer.save()
+    
+    return Response(
+        {
+            "message": "Name updated successfully",
+            "name": user.full_name
+        },
+        status=status.HTTP_200_OK
+    )
+             
 @api_view(['POST'])
 def update_email(request):
     serializer = serializers.UpdateEmailSerializer(data=request.data)
