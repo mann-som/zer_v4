@@ -10,6 +10,7 @@ class Instrument(models.Model):
         ("EQ", "Equity"),
     )
     
+    instrument_code = models.CharField(max_length=15, null=False, db_index=True, unique=True)
     symbol = models.CharField(max_length=20)
     name = models.CharField(max_length=255)
     exchange = models.CharField(max_length=10, choices=EXCHANGE_CHOICES)
