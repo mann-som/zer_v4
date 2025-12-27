@@ -1,8 +1,5 @@
 from attr import fields
 from rest_framework import serializers
-import serial
-from wtforms import ValidationError
-from yaml import serialize
 from .models import User
 from . import utils
 
@@ -12,12 +9,18 @@ class UserRegistrationsSerializer(serializers.ModelSerializer):
         fields = (
             "email",
             "full_name",
-            "mobile"
+            "mobile",
+            "password"
         )
         
     def create(self, validated_data):
+        password = validated_data.pop("password")
         validated_data['user_code'] = utils.generate_user_code()
-        return super().create(validated_data)
+        
+        user = User(**validated_data)
+        user.set_password(password)
+        user.save()
+        return user
 
 class UserDetailsSerializer(serializers.ModelSerializer):
     
@@ -25,6 +28,7 @@ class UserDetailsSerializer(serializers.ModelSerializer):
         model = User
         fields = (
             "id",
+            "user_code",
             "email",
             "full_name",
             "is_active",
