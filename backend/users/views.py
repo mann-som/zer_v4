@@ -2,6 +2,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
+from django.contrib.auth import authenticate
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from . import serializers
 from .models import User
@@ -110,3 +112,21 @@ def delete_user(request):
         status=status.HTTP_200_OK
     )
     
+class LoginView(APIView):
+    def post(self, request):
+        email = request.data.get("email")
+        password = request.data.get("password")
+        
+        user = authenticate(request, email=email, password=password)
+        
+        if not user:
+            return Response({"error" : "Invalid credentials"}, status=401)
+        
+        refresh = RefreshToken.for_user(user)
+        
+        return Response(
+            {
+                "access" : str(refresh.access_token),
+                "refresh" : str(refresh)
+            }
+        )
