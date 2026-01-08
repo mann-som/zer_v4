@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'trades',
 
     'rest_framework',
+    'orders',
 ]
 
 
