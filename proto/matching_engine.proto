@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package matching;
+
+import "google/protobuf/empty.proto";
+
+enum Side {
+  BUY = 0;
+  SELL = 1;
+}
+
+enum OrderType {
+  LIMIT = 0;
+  MARKET = 1;
+}
+
+message OrderRequest {
+  string order_id = 1;          
+  string instrument_id = 2;     
+  Side side = 3;
+  OrderType order_type = 4;
+  double price = 5;             
+  int64 quantity = 6;
+  int64 timestamp = 7;         
+}
+
+message TradeExecution {
+  string buy_order_id = 1;
+  string sell_order_id = 2;
+  string instrument_id = 3;
+  double price = 4;
+  int64 quantity = 5;
+  int64 timestamp = 6;
+}
+
+message MatchResult {
+  repeated TradeExecution trades = 1;
+  int64 remaining_quantity = 2;
+}
+
+message CancelOrderRequest {
+  string order_id = 1;
+  string instrument_id = 2;
+}
+
+message CancelOrderResponse {
+  bool success = 1;
+}
+
+service MatchingEngine {
+  rpc PlaceOrder(OrderRequest) returns (MatchResult);
+  rpc CancelOrder(CancelOrderRequest) returns (CancelOrderResponse);
+  rpc HealthCheck(google.protobuf.Empty) returns (google.protobuf.Empty);
+}
